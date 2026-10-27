@@ -567,13 +567,13 @@
       "title": "Distance-estimation test jig",
       "kind": "video",
       "category": "Proximity sensing",
-      "src": "assets/sensor-jig-motion.mp4",
-      "thumbnail": "assets/sensor-jig-motion-thumb.webp",
-      "caption": "A moving specimen approaches and recedes from the proximity sensor on the test jig.",
-      "sha256": "1a5adbc22b700cbb37fc740081faca0a7221d299cd0c07e2a3e7c10cd32857bc",
-      "bytes": 9905723,
-      "file_sha256": "1a5adbc22b700cbb37fc740081faca0a7221d299cd0c07e2a3e7c10cd32857bc",
-      "thumbnail_sha256": "cbfaebcd8db7d69d13cb60800cbd1f80ee5bc56b460d832b5afcc3574ed47c73"
+      "src": "assets/sensor-jig-with-plot.mp4",
+      "thumbnail": "assets/sensor-jig-with-plot-thumb.png",
+      "caption": "Test jig motion alongside its displayed distance-response plot, shown at 8× playback.",
+      "sha256": "c1b9eddaa031fbea52eccd29c1b54e7bfe010e13865c4440b004728a59cff732",
+      "bytes": 2394810,
+      "file_sha256": "c1b9eddaa031fbea52eccd29c1b54e7bfe010e13865c4440b004728a59cff732",
+      "thumbnail_sha256": "bc18eed84f28afbe4407d97fc50c158427ce1dd6150ee07a4ad318a91ecd7a11"
     },
     {
       "id": "idp-project-video",

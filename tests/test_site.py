@@ -5,6 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from threading import Thread
 import unittest
+import json
 import re
 
 from tools.serve import Handler
@@ -88,6 +89,17 @@ class PreviewTests(unittest.TestCase):
             "Yeong Gwang Son", "Hyunchang Kang", "Youngbin Song",
             "Hyunjoon Cho", "Hyouk Ryeol Choi",
         ])
+
+    def test_jig_video_uses_distance_plot(self):
+        root = Path(__file__).resolve().parents[1]
+        catalog = json.loads((root / "public/catalog.json").read_text(encoding="utf-8"))
+        asset = next(a for a in catalog["assets"] if a["id"] == "sensor-jig-motion")
+        self.assertEqual(asset["src"], "assets/sensor-jig-with-plot.mp4")
+        html = (root / "public/index.html").read_text(encoding="utf-8")
+        jig_section = re.search(r'<details[^>]*><summary>Watch the distance-estimation test jig</summary>.*?</details>', html, re.S)
+        self.assertIsNotNone(jig_section)
+        self.assertIn('data-video="sensor-jig-motion"', jig_section.group())
+        self.assertIn("8× playback", jig_section.group())
 
 
 if __name__ == "__main__":
