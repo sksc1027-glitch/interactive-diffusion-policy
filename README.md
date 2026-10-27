@@ -7,6 +7,10 @@ This repository contains the editable website and its selected figures and
 videos. It does **not** contain robot-control software, training datasets,
 checkpoints, the manuscript source, or internal correspondence.
 
+Authors, in the supplied submission-list order: Yeong Gwang Son, Hyunchang Kang,
+Youngbin Song, Hyunjoon Cho, and Hyouk Ryeol Choi. Submission-system identifiers
+and review-status information are not included in the website.
+
 ## Local Preview
 
 Python 3.10 or newer is sufficient. No package installation or build step is

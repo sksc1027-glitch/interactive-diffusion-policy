@@ -5,6 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from threading import Thread
 import unittest
+import re
 
 from tools.serve import Handler
 from tools.validate import validate
@@ -77,6 +78,16 @@ class PreviewTests(unittest.TestCase):
 
     def test_site_integrity(self):
         self.assertEqual(validate()["errors"], [])
+
+    def test_author_order(self):
+        root = Path(__file__).resolve().parents[1]
+        html = (root / "public/index.html").read_text(encoding="utf-8")
+        authors = re.search(r'<ul class="publication-authors".*?</ul>', html, re.S)
+        self.assertIsNotNone(authors)
+        self.assertEqual(re.findall(r"<li>(.*?)</li>", authors.group()), [
+            "Yeong Gwang Son", "Hyunchang Kang", "Youngbin Song",
+            "Hyunjoon Cho", "Hyouk Ryeol Choi",
+        ])
 
 
 if __name__ == "__main__":
