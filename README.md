@@ -50,14 +50,16 @@ tests after making changes. JavaScript can additionally be checked with
 
 ## Repository And Publication
 
-This repository was created as a **private, save-only** copy of the selected
-project page on 2026-10-27. No deployment workflow is installed and GitHub Pages
-is not enabled. Repository privacy is not website access control: review the
-hosting audience separately before any future deployment.
+The repository is private. `.github/workflows/deploy-pages.yml` prepares a GitHub
+Pages deployment of the `public/` directory on changes to `main`, or by manual
+workflow dispatch. A repository owner or administrator must enable GitHub Pages
+with **GitHub Actions** as its source before the workflow can publish. GitHub
+Pages availability for a private repository depends on the owner's plan.
 
-If publication is approved later, the static document root is `public/`.
-All website resource paths are relative, so a repository subpath is supported.
-The search-engine `noindex` directive is only a crawler hint, not authentication.
+Repository privacy is not website access control: the published site and its
+media may be publicly accessible. All website resource paths are relative, so a
+repository subpath is supported. The search-engine `noindex` directive is only
+a crawler hint, not authentication.
 
 The source snapshot follows the supplied October 2026 manuscript. Its result
 table is a transcription of the manuscript, not a new trial-level evaluation.
