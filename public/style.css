@@ -198,7 +198,8 @@ tr.ours .method-id{color:var(--ink)}
 .resource-list li{border-bottom:1px solid var(--rule)}
 .resource-card{display:grid;grid-template-columns:minmax(0,15rem) minmax(0,1fr);gap:1.5rem;padding:.8rem 0;color:var(--text)}
 .resource-card:hover{text-decoration:none}
-.resource-card:hover .resource-title{text-decoration:underline}
+a.resource-card:hover .resource-title{text-decoration:underline}
+.resource-card--pending .resource-title{color:var(--muted)}
 .resource-title{font-weight:600;color:var(--link)}
 .resource-desc{font-size:.95rem;color:var(--muted)}
 
