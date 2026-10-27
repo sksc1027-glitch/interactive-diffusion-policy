@@ -1,0 +1,83 @@
+from functools import partial
+from http.client import HTTPConnection
+from http.server import ThreadingHTTPServer
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from threading import Thread
+import unittest
+
+from tools.serve import Handler
+from tools.validate import validate
+
+
+class QuietHandler(Handler):
+    def log_message(self, *args):
+        pass
+
+
+class PreviewTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.temp = TemporaryDirectory()
+        root = Path(cls.temp.name)
+        (root / "index.html").write_text("<h1>IDP</h1>", encoding="utf-8")
+        (root / "sample.mp4").write_bytes(b"0123456789")
+        (root / "empty.mp4").touch()
+        (root / ".hidden").write_text("not served", encoding="utf-8")
+        (root / "assets").mkdir()
+        cls.server = ThreadingHTTPServer(
+            ("127.0.0.1", 0), partial(QuietHandler, directory=str(root))
+        )
+        cls.worker = Thread(target=cls.server.serve_forever, daemon=True)
+        cls.worker.start()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.shutdown()
+        cls.server.server_close()
+        cls.worker.join()
+        cls.temp.cleanup()
+
+    def request(self, path, range_header=None, method="GET"):
+        connection = HTTPConnection(*self.server.server_address)
+        headers = {"Range": range_header} if range_header else {}
+        connection.request(method, path, headers=headers)
+        response = connection.getresponse()
+        result = response.status, dict(response.getheaders()), response.read()
+        connection.close()
+        return result
+
+    def test_index(self):
+        self.assertEqual(self.request("/")[0], 200)
+
+    def test_video_ranges(self):
+        for header, expected in [("bytes=2-5", b"2345"), ("bytes=8-", b"89"), ("bytes=-3", b"789")]:
+            with self.subTest(header=header):
+                status, headers, body = self.request("/sample.mp4", header)
+                self.assertEqual(status, 206)
+                self.assertEqual(body, expected)
+                self.assertEqual(int(headers["Content-Length"]), len(expected))
+
+    def test_invalid_ranges(self):
+        for header in ["bytes=-0", "bytes=10-", "bytes=5-2", "bytes=-", "bytes=1-2,4-5"]:
+            with self.subTest(header=header):
+                self.assertEqual(self.request("/sample.mp4", header)[0], 416)
+        self.assertEqual(self.request("/empty.mp4", "bytes=0-")[0], 416)
+
+    def test_head_range(self):
+        status, headers, body = self.request("/sample.mp4", "bytes=0-1", "HEAD")
+        self.assertEqual(status, 206)
+        self.assertEqual(headers["Content-Range"], "bytes 0-1/10")
+        self.assertEqual(body, b"")
+
+    def test_no_repository_or_directory_listing(self):
+        for path in ["/.git/config", "/.hidden", "/assets/"]:
+            with self.subTest(path=path):
+                self.assertEqual(self.request(path)[0], 403)
+
+    def test_site_integrity(self):
+        self.assertEqual(validate()["errors"], [])
+
+
+if __name__ == "__main__":
+    unittest.main()
