@@ -624,6 +624,22 @@
       "thumbnail_sha256": "48db8ce5018de3abba99fea6ae9cd3b4c4186da328c2ecf3b597155fef137267"
     },
     {
+      "id": "idp-home-teaser",
+      "aliases": [
+        "idp-home-teaser"
+      ],
+      "title": "Real-robot avoidance and task resumption",
+      "kind": "video",
+      "category": "Rollouts & diagnostics",
+      "src": "assets/idp-home-teaser.mp4",
+      "thumbnail": "assets/fig9-robot-dgb-dp-rmp-lpb-thumb.webp",
+      "caption": "Edited excerpts from two recorded trials. First segment 1x; later segments 2x.",
+      "sha256": "5b463aa0561a8e66d34a447faf475619d25c47c12d00b123edd18f5236ef026c",
+      "bytes": 4866342,
+      "file_sha256": "5b463aa0561a8e66d34a447faf475619d25c47c12d00b123edd18f5236ef026c",
+      "thumbnail_sha256": "a6c250eaab6de4a6d201c4c458c1759868a6ee6645f5d5523a05888a0a1f3851"
+    },
+    {
       "id": "obstacle-interaction-full",
       "aliases": [
         "obstacle-interaction-full"
@@ -641,8 +657,8 @@
     }
   ],
   "counts": {
-    "total": 38,
-    "videos": 29,
+    "total": 39,
+    "videos": 30,
     "figures": 9
   }
 }

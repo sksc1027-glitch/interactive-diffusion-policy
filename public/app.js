@@ -77,7 +77,7 @@ dialog.addEventListener('click', e => {
   if (e.clientX < b.left || e.clientX > b.right || e.clientY < b.top || e.clientY > b.bottom) closeMedia();
 });
 
-function videoCard(asset, { title, caption, label, muted = false, preload = 'none', ariaLabel, className = 'video-card', analysisAsset }) {
+function videoCard(asset, { title, caption, label, muted = false, preload = 'none', ariaLabel, className = 'video-card', analysisAsset, headingFirst = false }) {
   const article = el('article', className);
   const video = document.createElement('video');
   video.controls = true; video.playsInline = true; video.preload = preload;
@@ -87,8 +87,15 @@ function videoCard(asset, { title, caption, label, muted = false, preload = 'non
   if (asset.thumbnail) video.poster = asset.thumbnail + revision;
   video.setAttribute('aria-label', ariaLabel || title);
   const body = el('div', 'card-body');
-  if (label) body.append(el('span', 'video-label', label));
-  body.append(el('h3', '', title), el('p', '', caption));
+  const heading = el('div', 'card-heading');
+  if (headingFirst) {
+    heading.append(el('h3', '', title));
+    if (label) heading.append(el('span', 'video-label', label));
+  } else {
+    if (label) body.append(el('span', 'video-label', label));
+    body.append(el('h3', '', title));
+  }
+  body.append(el('p', '', caption));
   const actions = el('div', 'video-actions');
   const enlarge = el('button', 'video-action', 'Enlarge video');
   enlarge.type = 'button';
@@ -103,27 +110,37 @@ function videoCard(asset, { title, caption, label, muted = false, preload = 'non
     actions.append(analysis);
   }
   body.append(actions);
+  if (headingFirst) article.append(heading);
   article.append(video, body);
   return article;
 }
 
 // Assets already embedded in the main sections stay out of the supplementary grid.
 const used = new Set();
-const hero = byId('idp-project-video') || byId('idp-research-montage') || byId('ral-two-interventions');
+const hero = byId('idp-home-teaser') || byId('idp-project-video') || byId('idp-research-montage');
 if (hero) {
   used.add(hero.id);
   const video = document.getElementById('hero-video');
   const revision = '?v=' + hero.sha256.slice(0, 12);
   video.src = hero.src + revision;
-  const widescreen = ['idp-project-video', 'idp-focused-highlight', 'idp-research-montage'].includes(hero.id);
+  const widescreen = ['idp-home-teaser', 'idp-project-video', 'idp-focused-highlight', 'idp-research-montage'].includes(hero.id);
   video.classList.toggle('research-montage', widescreen);
   video.classList.toggle('comparison-edit', !widescreen);
   video.poster = hero.thumbnail ? hero.thumbnail + revision : '';
-  document.querySelector('.video-chapters').hidden = hero.id !== 'idp-project-video';
+  if (hero.id === 'idp-home-teaser') {
+    const speed = document.getElementById('hero-speed');
+    speed.hidden = false;
+    video.loop = true;
+    video.addEventListener('timeupdate', () => { speed.textContent = video.currentTime < 17 ? '1×' : '2×'; });
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      video.autoplay = true;
+      video.play().catch(() => {});
+    }
+  }
 }
 document.querySelectorAll('[data-hero-time]').forEach(button => {
   button.addEventListener('click', () => {
-    const video = document.getElementById('hero-video');
+    const video = document.getElementById('full-video');
     const seek = () => { video.currentTime = Math.min(Number(button.dataset.heroTime), video.duration); };
     if (Number.isFinite(video.duration)) seek();
     else video.addEventListener('loadedmetadata', seek, { once: true });
@@ -175,12 +192,12 @@ features.forEach(([id, title, caption], i) => {
 });
 
 const trajectoryVideos = [
-  ['fig9-sync-dgb-dp-rmp-lpb', 'DGB', 'IDP', 'RMPflow avoidance with Recovery-aware LPB guidance.'],
-  ['fig9-sync-dgb-dp-rmp', 'DGB', 'DP + RMPflow', 'Reactive avoidance with policy continuation.'],
   ['fig9-sync-dgb-dp-stop', 'DGB', 'DP + Stop', 'Stop during intrusion, then continue the task.'],
-  ['fig9-sync-sao-dp-rmp-lpb', 'SAO', 'IDP', 'RMPflow avoidance with Recovery-aware LPB guidance.'],
+  ['fig9-sync-dgb-dp-rmp', 'DGB', 'DP + RMPflow', 'Reactive avoidance with policy continuation.'],
+  ['fig9-sync-dgb-dp-rmp-lpb', 'DGB', 'IDP', 'RMPflow avoidance with Recovery-aware LPB guidance.'],
+  ['fig9-sync-sao-dp-stop', 'SAO', 'DP + Stop', 'Sudden-obstacle stop baseline.'],
   ['fig9-sync-sao-dp-rmp', 'SAO', 'DP + RMPflow', 'Reactive avoidance with policy continuation.'],
-  ['fig9-sync-sao-dp-stop', 'SAO', 'DP + Stop', 'Sudden-obstacle stop baseline.']
+  ['fig9-sync-sao-dp-rmp-lpb', 'SAO', 'IDP', 'RMPflow avoidance with Recovery-aware LPB guidance.']
 ];
 const trajectoryTasks = [['DGB', 'Dynamic global blocking'], ['SAO', 'Suddenly appearing obstacle']];
 const trajectoryRoot = document.getElementById('trajectory-videos');
@@ -189,6 +206,54 @@ tabList.setAttribute('role', 'tablist');
 tabList.setAttribute('aria-label', 'Rollout task');
 const tabs = [];
 const panels = [];
+
+function comparisonControls(grid) {
+  const videos = Array.from(grid.querySelectorAll('video'));
+  const bar = el('div', 'comparison-bar');
+  const note = el('p', 'comparison-note', 'Representative trials · independent recordings');
+  note.setAttribute('role', 'status');
+  const controls = el('div', 'comparison-controls');
+  const toggle = el('button', 'comparison-button comparison-button--primary', 'Play all');
+  const replay = el('button', 'comparison-button', 'Replay all');
+  toggle.type = replay.type = 'button';
+  controls.append(toggle, replay);
+  bar.append(note, controls);
+
+  const refresh = () => {
+    toggle.textContent = videos.some(video => !video.paused && !video.ended) ? 'Pause all' : 'Play all';
+  };
+  let request = 0;
+  const play = () => {
+    const currentRequest = ++request;
+    const attempts = videos.map(video => {
+      if (video.ended) video.currentTime = 0;
+      return video.play();
+    });
+    refresh();
+    Promise.allSettled(attempts).then(results => {
+      if (currentRequest !== request) return;
+      note.textContent = results.some(result => result.status === 'rejected' && result.reason?.name !== 'AbortError')
+        ? 'Some videos could not play. Use their individual controls.'
+        : 'Representative trials · independent recordings';
+      refresh();
+    });
+  };
+  toggle.addEventListener('click', () => {
+    if (videos.some(video => !video.paused && !video.ended)) {
+      request++;
+      videos.forEach(video => video.pause());
+      refresh();
+    } else play();
+  });
+  replay.addEventListener('click', () => {
+    request++;
+    videos.forEach(video => { video.pause(); video.currentTime = 0; });
+    play();
+  });
+  videos.forEach(video => ['play', 'pause', 'ended'].forEach(event => video.addEventListener(event, refresh)));
+  return bar;
+}
+
 trajectoryTasks.forEach(([task, label]) => {
   const cards = trajectoryVideos.filter(item => item[1] === task).map(([id, , title, caption]) => {
     const analysis = byId(id);
@@ -198,7 +263,8 @@ trajectoryTasks.forEach(([task, label]) => {
     used.add(a.id);
     if (analysis) used.add(analysis.id);
     return videoCard(a, { title, caption, label: robot ? '1x recorded speed' : 'Trajectory analysis',
-      muted: true, ariaLabel: `${task}: ${title}`, className: 'video-card robot-card',
+      muted: true, ariaLabel: `${task}: ${title}`,
+      className: `video-card robot-card${title === 'IDP' ? ' robot-card--ours' : ''}`, headingFirst: true,
       analysisAsset: robot ? analysis : undefined });
   }).filter(Boolean);
   if (!cards.length) return;
@@ -214,7 +280,7 @@ trajectoryTasks.forEach(([task, label]) => {
   panel.setAttribute('aria-labelledby', tab.id);
   const grid = el('div', 'video-grid three');
   grid.append(...cards);
-  panel.append(grid);
+  panel.append(comparisonControls(grid), grid);
   tabs.push(tab); panels.push(panel); tabList.append(tab);
 });
 function selectTask(index, focus) {

@@ -13,8 +13,8 @@
   <title>Interactive Diffusion Policy: Safe Reactive Avoidance through Proximity Sensing in Human-Robot Shared Environments</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
-  <link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="style.css?v=449163284df3">
-  <script defer src="catalog.js?v=eeed02028821"></script><script defer src="app.js?v=00219e8bdcea"></script>
+  <link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="style.css?v=2eb1c6e0c629">
+  <script defer src="catalog.js?v=5538c480063a"></script><script defer src="app.js?v=bc32f6915ffc"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -43,16 +43,23 @@
 </div></section>
 
 <section class="teaser" aria-label="Highlight video"><div class="wrap">
-  <div class="media-frame"><video id="hero-video" class="research-montage" controls muted playsinline preload="metadata" aria-label="Interactive Diffusion Policy: task execution, avoidance, and recovery data collection"></video></div>
-  <div class="video-chapters" role="group" aria-label="Video chapters">
-    <button class="video-action" type="button" data-hero-time="0">Proximity sensing</button>
-    <button class="video-action" type="button" data-hero-time="44.055">Camera comparison</button>
-    <button class="video-action" type="button" data-hero-time="82.104">Data collection</button>
-    <button class="video-action" type="button" data-hero-time="109.296">Recovery comparison</button>
-    <button class="video-action" type="button" data-hero-time="136.62">Full task</button>
+  <div class="media-frame hero-frame">
+    <video id="hero-video" class="research-montage" controls muted playsinline preload="metadata" aria-label="Real-robot avoidance and task resumption in two recorded trials"></video>
+    <span id="hero-speed" class="hero-speed" aria-hidden="true" hidden>1×</span>
   </div>
-  <p class="teaser-note">Task execution, reactive avoidance, and recovery data collection on the RB10.</p>
+  <p class="teaser-note">Real-robot avoidance and task resumption in two recorded trials · 1× and 2× playback.</p>
   <p class="tldr">Proximity sensing enables local avoidance. Recovery-aware latent guidance helps the robot <i>resume the task</i> afterward.</p>
+  <details class="analysis-disclosure full-video">
+    <summary>Watch the full supplementary video</summary>
+    <div class="media-frame"><video id="full-video" controls muted playsinline preload="none" data-video="idp-project-video" aria-label="Full Interactive Diffusion Policy supplementary video"></video></div>
+    <div class="video-chapters" role="group" aria-label="Full video chapters">
+      <button class="video-action" type="button" data-hero-time="0">Proximity sensing</button>
+      <button class="video-action" type="button" data-hero-time="44.055">Camera comparison</button>
+      <button class="video-action" type="button" data-hero-time="82.104">Data collection</button>
+      <button class="video-action" type="button" data-hero-time="109.296">Recovery comparison</button>
+      <button class="video-action" type="button" data-hero-time="136.62">Full task</button>
+    </div>
+  </details>
 </div></section>
 
 <section class="section" id="abstract"><div class="wrap">
@@ -85,7 +92,18 @@
 <section class="section numbered" id="sensing"><div class="wrap">
   <h2 class="title">Proximity Sensing Around the Robot</h2>
   <p class="section-lead">Link-mounted sensors provide local distance information when an external camera cannot see an approaching object.</p>
-  <div class="figure-pair">
+  <div class="subsection sensor-scenarios">
+    <h3 class="subhead">Where depth sensing falls short</h3>
+    <p class="section-lead">The same RMPflow controller is evaluated with camera-based or proximity-based obstacle input.</p>
+    <div id="sensing-comparisons"></div>
+    <details class="analysis-disclosure"><summary>View the sensor comparison figure</summary>
+      <figure class="paper-figure sensor-comparison" data-feature="paper-sensor-comparison">
+        <button class="figure-open" type="button" aria-label="Enlarge depth camera versus proximity sensing comparison"><img alt="Avoidance with a visible obstacle, robot-induced camera occlusion, and transparent glass" loading="lazy"></button>
+        <figcaption><strong>Figure 4:</strong> Both sensing inputs support avoidance with an unobstructed view. Proximity sensing also supports avoidance in the shown robot-occlusion and transparent-glass cases, where depth-camera control collides.</figcaption>
+      </figure>
+    </details>
+  </div>
+  <div class="figure-pair sensor-hardware">
     <figure class="paper-figure" data-feature="paper-sensor-module">
       <button class="figure-open" type="button" aria-label="Enlarge RB10 sensor module"><img alt="RB10 sensor placement and exploded capacitive and ToF module" loading="lazy"></button>
       <figcaption><strong>Figure 2:</strong> Capacitive sensing and ToF modules mounted on the RB10 links.</figcaption>
@@ -103,17 +121,6 @@
     <div class="media-frame"><video controls muted playsinline preload="none" data-video="sensor-reactive-avoidance" aria-label="Proximity-driven RB10 obstacle avoidance"></video></div>
     <figcaption>Local avoidance as an obstacle approaches different parts of the robot.</figcaption>
   </figure>
-  <div class="subsection">
-    <h3 class="subhead">Where depth sensing falls short</h3>
-    <p class="section-lead">The same RMPflow controller is evaluated with camera-based or proximity-based obstacle input.</p>
-    <div id="sensing-comparisons"></div>
-    <details class="analysis-disclosure"><summary>View the sensor comparison figure</summary>
-    <figure class="paper-figure sensor-comparison" data-feature="paper-sensor-comparison">
-      <button class="figure-open" type="button" aria-label="Enlarge depth camera versus proximity sensing comparison"><img alt="Avoidance with a visible obstacle, robot-induced camera occlusion, and transparent glass" loading="lazy"></button>
-      <figcaption><strong>Figure 4:</strong> Both sensing inputs support avoidance with an unobstructed view. Proximity sensing also supports avoidance in the shown robot-occlusion and transparent-glass cases, where depth-camera control collides.</figcaption>
-    </figure>
-    </details>
-  </div>
   <details class="analysis-disclosure"><summary>Watch close-proximity interactions</summary><div id="proximity-videos"></div></details>
 </div></section>
 
