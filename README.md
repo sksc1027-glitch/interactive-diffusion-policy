@@ -50,11 +50,11 @@ tests after making changes. JavaScript can additionally be checked with
 
 ## Repository And Publication
 
-The repository is private. `.github/workflows/deploy-pages.yml` prepares a GitHub
-Pages deployment of the `public/` directory on changes to `main`, or by manual
-workflow dispatch. A repository owner or administrator must enable GitHub Pages
-with **GitHub Actions** as its source before the workflow can publish. GitHub
-Pages availability for a private repository depends on the owner's plan.
+The repository and its GitHub Pages site are public. The site is available at
+<https://sksc1027-glitch.github.io/interactive-diffusion-policy/>.
+`.github/workflows/deploy-pages.yml` publishes the `public/` directory on changes
+to `main`, or by manual workflow dispatch. A repository owner or administrator
+must keep GitHub Pages configured to use **GitHub Actions** as its source.
 
 Repository privacy is not website access control: the published site and its
 media may be publicly accessible. All website resource paths are relative, so a
