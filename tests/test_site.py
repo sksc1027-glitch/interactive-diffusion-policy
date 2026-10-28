@@ -112,6 +112,19 @@ class PreviewTests(unittest.TestCase):
         self.assertNotIn('class="site-nav"', html)
         self.assertIn("Coming soon.", html)
 
+    def test_research_montage_is_the_hero(self):
+        root = Path(__file__).resolve().parents[1]
+        html = (root / "public/index.html").read_text(encoding="utf-8")
+        catalog = json.loads((root / "public/catalog.json").read_text(encoding="utf-8"))
+        hero = re.search(r'<video\b[^>]*id="hero-video"[^>]*>', html)
+        self.assertIsNotNone(hero)
+        self.assertIn('data-hero="idp-research-montage"', hero.group())
+        self.assertTrue(any(a["id"] == "idp-research-montage" and a["kind"] == "video"
+                            for a in catalog["assets"]))
+        note = re.search(r'<p class="teaser-note">(.*?)</p>', html, re.S)
+        self.assertIn("human-guided data collection", note.group())
+        self.assertNotIn("two recorded trials", note.group())
+
 
 if __name__ == "__main__":
     unittest.main()

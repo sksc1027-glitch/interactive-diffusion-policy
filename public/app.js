@@ -89,10 +89,11 @@ function videoCard(asset, { title, caption, label, muted = false, preload = 'non
 
 // Assets already embedded in the main sections stay out of the supplementary grid.
 const used = new Set();
-const hero = byId('idp-home-teaser') || byId('idp-project-video') || byId('idp-research-montage');
+const heroVideo = document.getElementById('hero-video');
+const hero = byId(heroVideo.dataset.hero) || byId('idp-home-teaser') || byId('idp-project-video');
 if (hero) {
   used.add(hero.id);
-  const video = document.getElementById('hero-video');
+  const video = heroVideo;
   const revision = '?v=' + hero.sha256.slice(0, 12);
   video.src = hero.src + revision;
   const widescreen = ['idp-home-teaser', 'idp-project-video', 'idp-focused-highlight', 'idp-research-montage'].includes(hero.id);
@@ -102,8 +103,10 @@ if (hero) {
   if (hero.id === 'idp-home-teaser') {
     const speed = document.getElementById('hero-speed');
     speed.hidden = false;
-    video.loop = true;
     video.addEventListener('timeupdate', () => { speed.textContent = video.currentTime < 17 ? '1×' : '2×'; });
+  }
+  if (['idp-research-montage', 'idp-home-teaser'].includes(hero.id)) {
+    video.loop = true;
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       video.autoplay = true;
       video.play().catch(() => {});
