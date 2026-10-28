@@ -101,6 +101,17 @@ class PreviewTests(unittest.TestCase):
         self.assertIn('data-video="sensor-jig-motion"', jig_section.group())
         self.assertIn("8× playback", jig_section.group())
 
+    def test_reference_typography_and_navigation(self):
+        root = Path(__file__).resolve().parents[1]
+        html = (root / "public/index.html").read_text(encoding="utf-8")
+        css = (root / "public/style.css").read_text(encoding="utf-8")
+        self.assertIn("family=Source+Sans+Pro", html)
+        self.assertIn('<h1 class="publication-title">Interactive Diffusion Policy</h1>', html)
+        self.assertIn("--accent:#8c1515", css)
+        self.assertIn('<nav class="footer-nav" aria-label="Page sections">', html)
+        self.assertNotIn('class="site-nav"', html)
+        self.assertIn("Coming soon.", html)
+
 
 if __name__ == "__main__":
     unittest.main()

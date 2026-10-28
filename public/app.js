@@ -1,33 +1,5 @@
 'use strict';
 
-// Sticky section navigation: mark the section under the header as current.
-(() => {
-  const list = document.querySelector('.nav-links');
-  if (!list) return;
-  const links = [...list.querySelectorAll('a[href^="#"]')];
-  const sections = links.map(link => document.getElementById(link.hash.slice(1))).filter(Boolean);
-  let current = null;
-  let queued = false;
-  const update = () => {
-    queued = false;
-    let active = '';
-    for (const section of sections) if (section.getBoundingClientRect().top <= 140) active = section.id;
-    if (active === current) return;
-    current = active;
-    for (const link of links) {
-      if (link.hash === '#' + active) {
-        link.setAttribute('aria-current', 'true');
-        if (list.scrollWidth > list.clientWidth) list.scrollTo({ left: Math.max(0, link.offsetLeft - 24) });
-      } else {
-        link.removeAttribute('aria-current');
-      }
-    }
-  };
-  addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(update); } }, { passive: true });
-  addEventListener('resize', update);
-  update();
-})();
-
 const catalog = window.IDP_CATALOG;
 if (!catalog) { throw new Error('Missing catalog'); }
 const byId = id => catalog.assets.find(a => a.id === id || a.aliases.includes(id));
