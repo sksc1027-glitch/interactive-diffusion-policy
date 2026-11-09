@@ -1,10 +1,10 @@
-name: Deploy project site
+name: Retire legacy project site
 
 on:
   push:
     branches: [main]
     paths:
-      - 'public/**'
+      - 'retired-pages/**'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
@@ -25,10 +25,10 @@ jobs:
         uses: actions/checkout@v4
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
-      - name: Upload website
+      - name: Upload the retirement notice only
         uses: actions/upload-pages-artifact@v4
         with:
-          path: public
+          path: retired-pages
 
   deploy:
     needs: build
